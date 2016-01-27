@@ -125,22 +125,23 @@ public class JsmppClientKonnector extends SessionBasedClientKonnector {
 		try {
 
 			BindType l_bindType = BindType.BIND_TX;
-			if (m_config.mode
-					.equalsIgnoreCase(JsmppClientConfiguration.MODE_DUPLEX)) {
+			if (m_config.getMode().equalsIgnoreCase(
+					JsmppClientConfiguration.MODE_DUPLEX)) {
 				l_bindType = BindType.BIND_TRX;
 			}
 
-			smppSession.connectAndBind(m_config.host, m_config.port,
-					l_bindType, m_config.systemId, m_config.password,
-					m_config.systemType, m_config.typeOfNumber,
-					m_config.numberingPlanIndicator, m_config.adressRange);
+			smppSession.connectAndBind(m_config.getHost(), m_config.getPort(),
+					l_bindType, m_config.getSystemId(), m_config.getPassword(),
+					m_config.getSystemType(), m_config.getTypeOfNumber(),
+					m_config.getNumberingPlanIndicator(),
+					m_config.getAdressRange());
 
 			if (AdminLogger.isInfoEnabled())
-				AdminLogger.info(buildAdminLog("Bound to " + m_config.host
-						+ ":" + m_config.port));
+				AdminLogger.info(buildAdminLog("Bound to " + m_config.getHost()
+						+ ":" + m_config.getPort()));
 
-			if (m_config.mode
-					.equalsIgnoreCase(JsmppClientConfiguration.MODE_DUPLEX)) {
+			if (m_config.getMode().equalsIgnoreCase(
+					JsmppClientConfiguration.MODE_DUPLEX)) {
 				smppSession
 						.setMessageReceiverListener(new SessionMessageReceiverListener(
 								smppSession));
@@ -148,8 +149,9 @@ public class JsmppClientKonnector extends SessionBasedClientKonnector {
 
 			this.sessionStarted(session);
 		} catch (IOException e) {
-			AdminLogger.warn(buildAdminLog("Failed to bind to " + m_config.host
-					+ ":" + m_config.port + " : " + e.getMessage()));
+			AdminLogger.warn(buildAdminLog("Failed to bind to "
+					+ m_config.getHost() + ":" + m_config.getPort() + " : "
+					+ e.getMessage()));
 			this.sessionDied(session);
 		}
 	}

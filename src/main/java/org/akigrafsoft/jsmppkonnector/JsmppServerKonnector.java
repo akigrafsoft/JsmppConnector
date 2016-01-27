@@ -142,7 +142,7 @@ public class JsmppServerKonnector extends Konnector {
 									+ m_serverSession.getSessionId()));
 
 				try {
-					bindRequest.accept(m_config.systemId);
+					bindRequest.accept(m_config.getSystemId());
 				} catch (PDUStringException e) {
 					AdminLogger.warn(buildAdminLog("PDUStringException "
 							+ e.getMessage()));
@@ -165,7 +165,8 @@ public class JsmppServerKonnector extends Konnector {
 	protected CommandResult doStart() {
 
 		try {
-			m_sessionListener = new SMPPServerSessionListener(m_config.port);
+			m_sessionListener = new SMPPServerSessionListener(
+					m_config.getPort());
 		} catch (IOException e) {
 			return CommandResult.Fail;
 		}

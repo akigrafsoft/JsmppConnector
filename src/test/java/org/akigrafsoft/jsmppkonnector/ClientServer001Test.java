@@ -50,8 +50,8 @@ public class ClientServer001Test {
 			}
 
 			JsmppServerConfiguration config = new JsmppServerConfiguration();
-			config.port = 8542;
-			config.systemId = "sys";
+			config.setPort(8542);
+			config.setSystemId("sys");
 
 			try {
 				server_konnector.configure(config);
@@ -109,10 +109,10 @@ public class ClientServer001Test {
 			}
 
 			JsmppClientConfiguration config = new JsmppClientConfiguration();
-			config.numberOfSessions = 5;
-			config.host = "localhost";
-			config.port = 8542;
-			config.systemId = "sys";
+			config.setNumberOfSessions(5);
+			config.setHost("localhost");
+			config.setPort(8542);
+			config.setSystemId("sys");
 
 			try {
 				client_konnector.configure(config);
