@@ -19,23 +19,25 @@ import org.jsmpp.util.MessageId;
 
 import com.akigrafsoft.knetthreads.ExceptionDuplicate;
 import com.akigrafsoft.knetthreads.Message;
+import com.akigrafsoft.knetthreads.konnector.ExceptionCreateSessionFailed;
 import com.akigrafsoft.knetthreads.konnector.KonnectorConfiguration;
 import com.akigrafsoft.knetthreads.konnector.KonnectorDataobject;
 import com.akigrafsoft.knetthreads.konnector.SessionBasedClientKonnector;
 
 public class JsmppClientKonnector extends SessionBasedClientKonnector {
 
-	private JsmppClientConfiguration m_config = null;
-
 	public JsmppClientKonnector(String name) throws ExceptionDuplicate {
 		super(name);
 	}
 
 	@Override
+	public Class<? extends KonnectorConfiguration> getConfigurationClass() {
+		return JsmppClientConfiguration.class;
+	}
+
+	@Override
 	protected void doLoadConfig(KonnectorConfiguration config) {
 		super.doLoadConfig(config);
-
-		m_config = (JsmppClientConfiguration) config;
 	}
 
 	@Override
@@ -122,25 +124,29 @@ public class JsmppClientKonnector extends SessionBasedClientKonnector {
 	@Override
 	public void async_startSession(Session session) {
 		SMPPSession smppSession = (SMPPSession) session.getUserObject();
+
+		JsmppClientConfiguration l_config = (JsmppClientConfiguration) this
+				.getConfiguration();
+
 		try {
 
 			BindType l_bindType = BindType.BIND_TX;
-			if (m_config.getMode().equalsIgnoreCase(
+			if (l_config.getMode().equalsIgnoreCase(
 					JsmppClientConfiguration.MODE_DUPLEX)) {
 				l_bindType = BindType.BIND_TRX;
 			}
 
-			smppSession.connectAndBind(m_config.getHost(), m_config.getPort(),
-					l_bindType, m_config.getSystemId(), m_config.getPassword(),
-					m_config.getSystemType(), m_config.getTypeOfNumber(),
-					m_config.getNumberingPlanIndicator(),
-					m_config.getAdressRange());
+			smppSession.connectAndBind(l_config.getHost(), l_config.getPort(),
+					l_bindType, l_config.getSystemId(), l_config.getPassword(),
+					l_config.getSystemType(), l_config.getTypeOfNumber(),
+					l_config.getNumberingPlanIndicator(),
+					l_config.getAdressRange());
 
 			if (AdminLogger.isInfoEnabled())
-				AdminLogger.info(buildAdminLog("Bound to " + m_config.getHost()
-						+ ":" + m_config.getPort()));
+				AdminLogger.info(buildAdminLog("Bound to " + l_config.getHost()
+						+ ":" + l_config.getPort()));
 
-			if (m_config.getMode().equalsIgnoreCase(
+			if (l_config.getMode().equalsIgnoreCase(
 					JsmppClientConfiguration.MODE_DUPLEX)) {
 				smppSession
 						.setMessageReceiverListener(new SessionMessageReceiverListener(
@@ -150,7 +156,7 @@ public class JsmppClientKonnector extends SessionBasedClientKonnector {
 			this.sessionStarted(session);
 		} catch (IOException e) {
 			AdminLogger.warn(buildAdminLog("Failed to bind to "
-					+ m_config.getHost() + ":" + m_config.getPort() + " : "
+					+ l_config.getHost() + ":" + l_config.getPort() + " : "
 					+ e.getMessage()));
 			this.sessionDied(session);
 		}

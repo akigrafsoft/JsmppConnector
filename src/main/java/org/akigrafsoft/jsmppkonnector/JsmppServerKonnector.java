@@ -44,7 +44,7 @@ public class JsmppServerKonnector extends Konnector {
 
 	private final MessageIDGenerator m_messageIdGenerator = new RandomMessageIDGenerator();
 
-	private JsmppServerConfiguration m_config = null;
+	// private JsmppServerConfiguration m_config = null;
 	private SMPPServerSessionListener m_sessionListener;
 	private boolean m_shouldStop = false;
 
@@ -117,12 +117,16 @@ public class JsmppServerKonnector extends Konnector {
 
 	public JsmppServerKonnector(String name) throws ExceptionDuplicate {
 		super(name);
-		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public Class<? extends KonnectorConfiguration> getConfigurationClass() {
+		return JsmppServerConfiguration.class;
 	}
 
 	@Override
 	protected void doLoadConfig(KonnectorConfiguration config) {
-		m_config = (JsmppServerConfiguration) config;
+		super.doLoadConfig(config);
 	}
 
 	private class WaitBindTask implements Runnable {
@@ -142,7 +146,9 @@ public class JsmppServerKonnector extends Konnector {
 									+ m_serverSession.getSessionId()));
 
 				try {
-					bindRequest.accept(m_config.getSystemId());
+					bindRequest
+							.accept(((JsmppServerConfiguration) getConfiguration())
+									.getSystemId());
 				} catch (PDUStringException e) {
 					AdminLogger.warn(buildAdminLog("PDUStringException "
 							+ e.getMessage()));
@@ -166,7 +172,7 @@ public class JsmppServerKonnector extends Konnector {
 
 		try {
 			m_sessionListener = new SMPPServerSessionListener(
-					m_config.getPort());
+					((JsmppServerConfiguration) getConfiguration()).getPort());
 		} catch (IOException e) {
 			return CommandResult.Fail;
 		}
