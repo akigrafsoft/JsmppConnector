@@ -50,53 +50,47 @@ public class JsmppServerKonnector extends Konnector {
 
 	private ServerMessageReceiverListener m_messageReceiverListener = new ServerMessageReceiverListener() {
 		@Override
-		public DataSmResult onAcceptDataSm(DataSm arg0, Session arg1)
+		public DataSmResult onAcceptDataSm(DataSm arg0, Session arg1) throws ProcessRequestException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void onAcceptCancelSm(CancelSm arg0, SMPPServerSession arg1) throws ProcessRequestException {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public QuerySmResult onAcceptQuerySm(QuerySm arg0, SMPPServerSession arg1) throws ProcessRequestException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		@Override
+		public void onAcceptReplaceSm(ReplaceSm arg0, SMPPServerSession arg1) throws ProcessRequestException {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public SubmitMultiResult onAcceptSubmitMulti(SubmitMulti arg0, SMPPServerSession arg1)
 				throws ProcessRequestException {
 			// TODO Auto-generated method stub
 			return null;
 		}
 
 		@Override
-		public void onAcceptCancelSm(CancelSm arg0, SMPPServerSession arg1)
+		public MessageId onAcceptSubmitSm(SubmitSm sms, SMPPServerSession serverSession)
 				throws ProcessRequestException {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public QuerySmResult onAcceptQuerySm(QuerySm arg0,
-				SMPPServerSession arg1) throws ProcessRequestException {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public void onAcceptReplaceSm(ReplaceSm arg0, SMPPServerSession arg1)
-				throws ProcessRequestException {
-			// TODO Auto-generated method stub
-
-		}
-
-		@Override
-		public SubmitMultiResult onAcceptSubmitMulti(SubmitMulti arg0,
-				SMPPServerSession arg1) throws ProcessRequestException {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-		@Override
-		public MessageId onAcceptSubmitSm(SubmitSm sms,
-				SMPPServerSession serverSession) throws ProcessRequestException {
 			Message message = new Message();
 			SmsDataobject l_dataobject = new SmsDataobject(message);
 
 			if (ActivityLogger.isDebugEnabled())
-				ActivityLogger.debug(buildActivityLog(message,
-						"onAcceptSubmitSm<" + sms.getShortMessage() + ">"));
+				ActivityLogger.debug(buildActivityLog(message, "onAcceptSubmitSm<" + sms.getShortMessage() + ">"));
 
 			try {
-				l_dataobject.inboundBuffer = new String(sms.getShortMessage(),
-						"UTF-8");
+				l_dataobject.inboundBuffer = new String(sms.getShortMessage(), "UTF-8");
 			} catch (UnsupportedEncodingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -141,28 +135,20 @@ public class JsmppServerKonnector extends Konnector {
 				BindRequest bindRequest = m_serverSession.waitForBind(1000);
 
 				if (AdminLogger.isDebugEnabled())
-					AdminLogger
-							.debug(buildAdminLog("Accepting bind for session "
-									+ m_serverSession.getSessionId()));
+					AdminLogger.debug(buildAdminLog("Accepting bind for session " + m_serverSession.getSessionId()));
 
 				try {
-					bindRequest
-							.accept(((JsmppServerConfiguration) getConfiguration())
-									.getSystemId());
+					bindRequest.accept(((JsmppServerConfiguration) getConfiguration()).getSystemId());
 				} catch (PDUStringException e) {
-					AdminLogger.warn(buildAdminLog("PDUStringException "
-							+ e.getMessage()));
+					AdminLogger.warn(buildAdminLog("PDUStringException " + e.getMessage()));
 					bindRequest.reject(SMPPConstant.STAT_ESME_RSYSERR);
 				}
 			} catch (IllegalStateException e) {
-				AdminLogger.warn(buildAdminLog("IllegalStateException "
-						+ e.getMessage()));
+				AdminLogger.warn(buildAdminLog("IllegalStateException " + e.getMessage()));
 			} catch (TimeoutException e) {
-				AdminLogger.warn(buildAdminLog("TimeoutException "
-						+ e.getMessage()));
+				AdminLogger.warn(buildAdminLog("TimeoutException " + e.getMessage()));
 			} catch (IOException e) {
-				AdminLogger
-						.warn(buildAdminLog("IOException " + e.getMessage()));
+				AdminLogger.warn(buildAdminLog("IOException " + e.getMessage()));
 			}
 		}
 	}
@@ -183,6 +169,7 @@ public class JsmppServerKonnector extends Konnector {
 			@Override
 			public void run() {
 				setStarted();
+				setAvailable();
 				while (!m_shouldStop) {
 					SMPPServerSession serverSession;
 					try {
@@ -193,8 +180,7 @@ public class JsmppServerKonnector extends Konnector {
 						break;
 					}
 					// serverSession.getSessionId());
-					serverSession
-							.setMessageReceiverListener(m_messageReceiverListener);
+					serverSession.setMessageReceiverListener(m_messageReceiverListener);
 					executeInNetworkThread(new WaitBindTask(serverSession));
 				}
 
@@ -204,6 +190,7 @@ public class JsmppServerKonnector extends Konnector {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				setUnavailable();
 				setStopped();
 			}
 		};
@@ -219,30 +206,22 @@ public class JsmppServerKonnector extends Konnector {
 
 		SMPPServerSession l_serverSession = (SMPPServerSession) l_dataobject.inboundSession;
 
-		String stringValue = Integer.valueOf(l_dataobject.messageId.getValue(),
-				16).toString();
+		String stringValue = Integer.valueOf(l_dataobject.messageId.getValue(), 16).toString();
 		//
-		DeliveryReceipt delRec = new DeliveryReceipt(stringValue, 1, 1,
-				new Date(), new Date(), DeliveryReceiptState.DELIVRD, null,
-				new String(l_dataobject.submitSm.getShortMessage()));
+		DeliveryReceipt delRec = new DeliveryReceipt(stringValue, 1, 1, new Date(), new Date(),
+				DeliveryReceiptState.DELIVRD, null, new String(l_dataobject.submitSm.getShortMessage()));
 		try {
-			l_serverSession.deliverShortMessage(l_dataobject.submitSm
-					.getServiceType(), org.jsmpp.bean.TypeOfNumber
-					.valueOf(l_dataobject.submitSm.getDestAddrTon()),
-					org.jsmpp.bean.NumberingPlanIndicator
-							.valueOf(l_dataobject.submitSm.getDestAddrNpi()),
+			l_serverSession.deliverShortMessage(l_dataobject.submitSm.getServiceType(),
+					org.jsmpp.bean.TypeOfNumber.valueOf(l_dataobject.submitSm.getDestAddrTon()),
+					org.jsmpp.bean.NumberingPlanIndicator.valueOf(l_dataobject.submitSm.getDestAddrNpi()),
 					l_dataobject.submitSm.getDestAddress(),
-					org.jsmpp.bean.TypeOfNumber.valueOf(l_dataobject.submitSm
-							.getSourceAddrTon()),
-					org.jsmpp.bean.NumberingPlanIndicator
-							.valueOf(l_dataobject.submitSm.getSourceAddrNpi()),
-					l_dataobject.submitSm.getSourceAddr(), new ESMClass(
-							org.jsmpp.bean.MessageMode.DEFAULT,
-							org.jsmpp.bean.MessageType.SMSC_DEL_RECEIPT,
+					org.jsmpp.bean.TypeOfNumber.valueOf(l_dataobject.submitSm.getSourceAddrTon()),
+					org.jsmpp.bean.NumberingPlanIndicator.valueOf(l_dataobject.submitSm.getSourceAddrNpi()),
+					l_dataobject.submitSm.getSourceAddr(),
+					new ESMClass(org.jsmpp.bean.MessageMode.DEFAULT, org.jsmpp.bean.MessageType.SMSC_DEL_RECEIPT,
 							org.jsmpp.bean.GSMSpecificFeature.DEFAULT),
-					(byte) 0, (byte) 0, new RegisteredDelivery(0),
-					org.jsmpp.bean.DataCodings.newInstance((byte) 0), delRec
-							.toString().getBytes());
+					(byte) 0, (byte) 0, new RegisteredDelivery(0), org.jsmpp.bean.DataCodings.newInstance((byte) 0),
+					delRec.toString().getBytes());
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 			this.resumeWithNetworkError(l_dataobject, e.getMessage());
@@ -271,8 +250,7 @@ public class JsmppServerKonnector extends Konnector {
 
 		if (ActivityLogger.isDebugEnabled())
 			ActivityLogger.debug(buildActivityLog(dataobject.getMessage(),
-					"Sending delivery receipt for message id "
-							+ l_dataobject.messageId + ":" + stringValue));
+					"Sending delivery receipt for message id " + l_dataobject.messageId + ":" + stringValue));
 
 		resumeWithExecutionComplete(dataobject);
 	}
