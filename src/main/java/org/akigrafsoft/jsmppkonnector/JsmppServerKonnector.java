@@ -1,3 +1,9 @@
+/**
+ * Open-source, by AkiGrafSoft.
+ *
+ * $Id:  $
+ *
+ **/
 package org.akigrafsoft.jsmppkonnector;
 
 import java.io.IOException;
@@ -40,11 +46,16 @@ import com.akigrafsoft.knetthreads.konnector.Konnector;
 import com.akigrafsoft.knetthreads.konnector.KonnectorConfiguration;
 import com.akigrafsoft.knetthreads.konnector.KonnectorDataobject;
 
+/**
+ * Jsmpp Server
+ * 
+ * @author kmoyse
+ *
+ */
 public class JsmppServerKonnector extends Konnector {
 
 	private final MessageIDGenerator m_messageIdGenerator = new RandomMessageIDGenerator();
 
-	// private JsmppServerConfiguration m_config = null;
 	private SMPPServerSessionListener m_sessionListener;
 	private boolean m_shouldStop = false;
 
@@ -58,7 +69,6 @@ public class JsmppServerKonnector extends Konnector {
 		@Override
 		public void onAcceptCancelSm(CancelSm arg0, SMPPServerSession arg1) throws ProcessRequestException {
 			// TODO Auto-generated method stub
-
 		}
 
 		@Override
@@ -70,7 +80,6 @@ public class JsmppServerKonnector extends Konnector {
 		@Override
 		public void onAcceptReplaceSm(ReplaceSm arg0, SMPPServerSession arg1) throws ProcessRequestException {
 			// TODO Auto-generated method stub
-
 		}
 
 		@Override
@@ -92,8 +101,9 @@ public class JsmppServerKonnector extends Konnector {
 			try {
 				l_dataobject.inboundBuffer = new String(sms.getShortMessage(), "UTF-8");
 			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
+				AdminLogger.warn(buildAdminLog("UnsupportedEncodingException:" + e.getMessage()));
 				e.printStackTrace();
+				throw new ProcessRequestException(e.getMessage(), 0);
 			}
 
 			l_dataobject.submitSm = sms;
@@ -140,15 +150,17 @@ public class JsmppServerKonnector extends Konnector {
 				try {
 					bindRequest.accept(((JsmppServerConfiguration) getConfiguration()).getSystemId());
 				} catch (PDUStringException e) {
-					AdminLogger.warn(buildAdminLog("PDUStringException " + e.getMessage()));
+					AdminLogger.warn(buildAdminLog("PDUStringException:" + e.getMessage()));
 					bindRequest.reject(SMPPConstant.STAT_ESME_RSYSERR);
 				}
 			} catch (IllegalStateException e) {
-				AdminLogger.warn(buildAdminLog("IllegalStateException " + e.getMessage()));
+				AdminLogger.warn(buildAdminLog("IllegalStateException:" + e.getMessage()));
+				e.printStackTrace();
 			} catch (TimeoutException e) {
-				AdminLogger.warn(buildAdminLog("TimeoutException " + e.getMessage()));
+				AdminLogger.warn(buildAdminLog("TimeoutException:" + e.getMessage()));
 			} catch (IOException e) {
-				AdminLogger.warn(buildAdminLog("IOException " + e.getMessage()));
+				AdminLogger.warn(buildAdminLog("IOException:" + e.getMessage()));
+				e.printStackTrace();
 			}
 		}
 	}
@@ -175,7 +187,7 @@ public class JsmppServerKonnector extends Konnector {
 					try {
 						serverSession = m_sessionListener.accept();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
+						AdminLogger.warn(buildAdminLog("accept()|IOException:" + e.getMessage()));
 						e.printStackTrace();
 						break;
 					}
@@ -184,13 +196,15 @@ public class JsmppServerKonnector extends Konnector {
 					executeInNetworkThread(new WaitBindTask(serverSession));
 				}
 
+				setUnavailable();
+
 				try {
 					m_sessionListener.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+					AdminLogger.warn(buildAdminLog("close()|IOException:" + e.getMessage()));
 					e.printStackTrace();
 				}
-				setUnavailable();
+
 				setStopped();
 			}
 		};

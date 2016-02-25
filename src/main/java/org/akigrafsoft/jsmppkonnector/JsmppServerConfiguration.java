@@ -1,3 +1,9 @@
+/**
+ * Open-source, by AkiGrafSoft.
+ *
+ * $Id:  $
+ *
+ **/
 package org.akigrafsoft.jsmppkonnector;
 
 import com.akigrafsoft.knetthreads.ExceptionAuditFailed;
@@ -66,8 +72,7 @@ public class JsmppServerConfiguration extends KonnectorConfiguration {
 			throw new ExceptionAuditFailed("port must be provided and > 0");
 		}
 		if ((systemId == null) || systemId.equals("")) {
-			throw new ExceptionAuditFailed(
-					"systemId must be provided and non empty");
+			throw new ExceptionAuditFailed("systemId must be provided and non empty");
 		}
 	}
 }

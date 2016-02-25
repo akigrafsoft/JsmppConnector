@@ -1,3 +1,9 @@
+/**
+ * Open-source, by AkiGrafSoft.
+ *
+ * $Id:  $
+ *
+ **/
 package org.akigrafsoft.jsmppkonnector;
 
 import org.jsmpp.bean.NumberingPlanIndicator;
@@ -15,8 +21,7 @@ import com.akigrafsoft.knetthreads.konnector.SessionBasedClientKonnectorConfigur
  * @author kmoyse
  * 
  */
-public class JsmppClientConfiguration extends
-		SessionBasedClientKonnectorConfiguration {
+public class JsmppClientConfiguration extends SessionBasedClientKonnectorConfiguration {
 
 	/**
 	 * 
@@ -98,8 +103,7 @@ public class JsmppClientConfiguration extends
 		return numberingPlanIndicator;
 	}
 
-	public void setNumberingPlanIndicator(
-			NumberingPlanIndicator numberingPlanIndicator) {
+	public void setNumberingPlanIndicator(NumberingPlanIndicator numberingPlanIndicator) {
 		this.numberingPlanIndicator = numberingPlanIndicator;
 	}
 
@@ -126,23 +130,18 @@ public class JsmppClientConfiguration extends
 	public void audit() throws ExceptionAuditFailed {
 		super.audit();
 		if ((host == null) || host.equals("")) {
-			throw new ExceptionAuditFailed(
-					"host must be provided and non empty, default="
-							+ DEFAULT_host);
+			throw new ExceptionAuditFailed("host must be provided and non empty, default=" + DEFAULT_host);
 		}
 		if (port <= 0) {
 			throw new ExceptionAuditFailed("port must be provided and > 0");
 		}
 
 		if ((systemId == null) || systemId.equals("")) {
-			throw new ExceptionAuditFailed(
-					"systemId must be provided and non empty");
+			throw new ExceptionAuditFailed("systemId must be provided and non empty");
 		}
 
-		if (!mode.equalsIgnoreCase(MODE_SIMPLEX)
-				&& !mode.equalsIgnoreCase(MODE_DUPLEX)) {
-			throw new ExceptionAuditFailed("mode must be provided"
-					+ MODE_SIMPLEX + "or " + MODE_DUPLEX);
+		if (!mode.equalsIgnoreCase(MODE_SIMPLEX) && !mode.equalsIgnoreCase(MODE_DUPLEX)) {
+			throw new ExceptionAuditFailed("mode must be provided" + MODE_SIMPLEX + "or " + MODE_DUPLEX);
 		}
 	}
 

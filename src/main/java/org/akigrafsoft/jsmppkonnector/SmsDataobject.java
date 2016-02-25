@@ -1,3 +1,9 @@
+/**
+ * Open-source, by AkiGrafSoft.
+ *
+ * $Id:  $
+ *
+ **/
 package org.akigrafsoft.jsmppkonnector;
 
 import org.jsmpp.bean.DataCoding;
@@ -18,7 +24,7 @@ public class SmsDataobject extends KonnectorDataobject {
 	 * 
 	 */
 	private static final long serialVersionUID = -642990612822534381L;
-	
+
 	public String serviceType;
 	public TypeOfNumber sourceAddrTon;
 	public NumberingPlanIndicator sourceAddrNpi;
@@ -35,19 +41,19 @@ public class SmsDataobject extends KonnectorDataobject {
 	public byte replaceIfPresentFlag;
 	public DataCoding dataCoding;
 	public byte smDefaultMsgId;
-	
+
 	// we will use the outboundBuffer
-	//public byte[] shortMessage;
-	
+	// public byte[] shortMessage;
+
 	public OptionalParameter[] optionalParameters;
-	
+
 	//
 	transient public MessageId messageId;
-	
+
 	// carry inbound session
 	transient org.jsmpp.session.Session inboundSession;
 	transient SubmitSm submitSm;
-	
+
 	public SmsDataobject(Message message) {
 		super(message);
 		// TODO Auto-generated constructor stub

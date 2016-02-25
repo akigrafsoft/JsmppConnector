@@ -1,3 +1,9 @@
+/**
+ * Open-source, by AkiGrafSoft.
+ *
+ * $Id:  $
+ *
+ **/
 package org.akigrafsoft.jsmppkonnector;
 
 import java.io.IOException;
@@ -45,23 +51,17 @@ public class JsmppClientKonnector extends SessionBasedClientKonnector {
 		SmsDataobject sms = (SmsDataobject) dataobject;
 		final SMPPSession smppSession = (SMPPSession) session.getUserObject();
 		try {
-			String messageId = smppSession.submitShortMessage(sms.serviceType,
-					sms.sourceAddrTon, sms.sourceAddrNpi, sms.sourceAddr,
-					sms.destAddrTon, sms.destAddrNpi, sms.destinationAddr,
-					sms.esmClass, sms.protocolId, sms.priorityFlag,
-					sms.scheduleDeliveryTime, sms.validityPeriod,
-					sms.registeredDelivery, sms.replaceIfPresentFlag,
-					sms.dataCoding, sms.smDefaultMsgId,
-					sms.outboundBuffer.getBytes());
+			String messageId = smppSession.submitShortMessage(sms.serviceType, sms.sourceAddrTon, sms.sourceAddrNpi,
+					sms.sourceAddr, sms.destAddrTon, sms.destAddrNpi, sms.destinationAddr, sms.esmClass, sms.protocolId,
+					sms.priorityFlag, sms.scheduleDeliveryTime, sms.validityPeriod, sms.registeredDelivery,
+					sms.replaceIfPresentFlag, sms.dataCoding, sms.smDefaultMsgId, sms.outboundBuffer.getBytes());
 			// sms.optionalParameters);
 
 			if (ActivityLogger.isDebugEnabled())
 				ActivityLogger.debug(buildActivityLog(dataobject.getMessage(),
-						"Sent sms <" + sms.outboundBuffer.getBytes() + ">("
-								+ messageId + ")"));
+						"Sent sms <" + sms.outboundBuffer.getBytes() + ">(" + messageId + ")"));
 			sms.messageId = new MessageId(messageId);
-		} catch (PDUException | InvalidResponseException
-				| NegativeResponseException e) {
+		} catch (PDUException | InvalidResponseException | NegativeResponseException e) {
 			this.notifyFunctionalError(dataobject, e.getMessage());
 			return;
 		} catch (ResponseTimeoutException | IOException e) {
@@ -73,8 +73,7 @@ public class JsmppClientKonnector extends SessionBasedClientKonnector {
 	}
 
 	@Override
-	protected void createSession(Session session)
-			throws ExceptionCreateSessionFailed {
+	protected void createSession(Session session) throws ExceptionCreateSessionFailed {
 		session.setUserObject(new SMPPSession());
 	}
 
@@ -86,8 +85,7 @@ public class JsmppClientKonnector extends SessionBasedClientKonnector {
 		}
 
 		@Override
-		public DataSmResult onAcceptDataSm(DataSm i_sms,
-				org.jsmpp.session.Session i_session)
+		public DataSmResult onAcceptDataSm(DataSm i_sms, org.jsmpp.session.Session i_session)
 				throws ProcessRequestException {
 			System.out.println("MessageReceiverListener::onAcceptDataSm");
 			return null;
@@ -95,20 +93,17 @@ public class JsmppClientKonnector extends SessionBasedClientKonnector {
 
 		@Override
 		public void onAcceptAlertNotification(AlertNotification arg0) {
-			System.out
-					.println("MessageReceiverListener::onAcceptAlertNotification");
+			System.out.println("MessageReceiverListener::onAcceptAlertNotification");
 		}
 
 		@Override
-		public void onAcceptDeliverSm(DeliverSm i_sms)
-				throws ProcessRequestException {
+		public void onAcceptDeliverSm(DeliverSm i_sms) throws ProcessRequestException {
 			System.out.println("MessageReceiverListener::onAcceptDeliverSm");
 			Message message = new Message();
 			SmsDataobject l_dataobject = new SmsDataobject(message);
 
 			try {
-				l_dataobject.inboundBuffer = new String(
-						i_sms.getShortMessage(), "UTF-8");
+				l_dataobject.inboundBuffer = new String(i_sms.getShortMessage(), "UTF-8");
 			} catch (UnsupportedEncodingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -125,39 +120,30 @@ public class JsmppClientKonnector extends SessionBasedClientKonnector {
 	public void async_startSession(Session session) {
 		SMPPSession smppSession = (SMPPSession) session.getUserObject();
 
-		JsmppClientConfiguration l_config = (JsmppClientConfiguration) this
-				.getConfiguration();
+		JsmppClientConfiguration l_config = (JsmppClientConfiguration) this.getConfiguration();
 
 		try {
 
 			BindType l_bindType = BindType.BIND_TX;
-			if (l_config.getMode().equalsIgnoreCase(
-					JsmppClientConfiguration.MODE_DUPLEX)) {
+			if (l_config.getMode().equalsIgnoreCase(JsmppClientConfiguration.MODE_DUPLEX)) {
 				l_bindType = BindType.BIND_TRX;
 			}
 
-			smppSession.connectAndBind(l_config.getHost(), l_config.getPort(),
-					l_bindType, l_config.getSystemId(), l_config.getPassword(),
-					l_config.getSystemType(), l_config.getTypeOfNumber(),
-					l_config.getNumberingPlanIndicator(),
-					l_config.getAdressRange());
+			smppSession.connectAndBind(l_config.getHost(), l_config.getPort(), l_bindType, l_config.getSystemId(),
+					l_config.getPassword(), l_config.getSystemType(), l_config.getTypeOfNumber(),
+					l_config.getNumberingPlanIndicator(), l_config.getAdressRange());
 
 			if (AdminLogger.isInfoEnabled())
-				AdminLogger.info(buildAdminLog("Bound to " + l_config.getHost()
-						+ ":" + l_config.getPort()));
+				AdminLogger.info(buildAdminLog("Bound to " + l_config.getHost() + ":" + l_config.getPort()));
 
-			if (l_config.getMode().equalsIgnoreCase(
-					JsmppClientConfiguration.MODE_DUPLEX)) {
-				smppSession
-						.setMessageReceiverListener(new SessionMessageReceiverListener(
-								smppSession));
+			if (l_config.getMode().equalsIgnoreCase(JsmppClientConfiguration.MODE_DUPLEX)) {
+				smppSession.setMessageReceiverListener(new SessionMessageReceiverListener(smppSession));
 			}
 
 			this.sessionStarted(session);
 		} catch (IOException e) {
-			AdminLogger.warn(buildAdminLog("Failed to bind to "
-					+ l_config.getHost() + ":" + l_config.getPort() + " : "
-					+ e.getMessage()));
+			AdminLogger.warn(buildAdminLog(
+					"Failed to bind to " + l_config.getHost() + ":" + l_config.getPort() + " : " + e.getMessage()));
 			this.sessionDied(session);
 		}
 	}
