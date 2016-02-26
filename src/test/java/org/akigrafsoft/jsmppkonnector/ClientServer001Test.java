@@ -64,25 +64,23 @@ public class ClientServer001Test {
 			try {
 				Endpoint l_nap = new Endpoint("TESTNAP") {
 					@Override
-					public KonnectorRouter getKonnectorRouter(Message message,
-							KonnectorDataobject dataobject) {
+					public KonnectorRouter getKonnectorRouter(Message message, KonnectorDataobject dataobject) {
 						// TODO Auto-generated method stub
 						return null;
 					}
 
 					@Override
-					public RequestEnum classifyInboundMessage(Message message,
-							KonnectorDataobject dataobject) {
+					public RequestEnum classifyInboundMessage(Message message, KonnectorDataobject dataobject) {
 						SmsDataobject do_sms = (SmsDataobject) dataobject;
 						System.out.println("received" + do_sms.inboundBuffer);
 						return null;
 					}
 				};
-				l_nap.setDispatcher(new Dispatcher() {
+				l_nap.setDispatcher(new Dispatcher<RequestEnum>("foo") {
 
 					@Override
-					public FlowProcessContext getContext(Message message,
-							KonnectorDataobject dataobject, RequestEnum request) {
+					public FlowProcessContext getContext(Message message, KonnectorDataobject dataobject,
+							RequestEnum request) {
 						// TODO Auto-generated method stub
 						return null;
 					}
