@@ -17,6 +17,7 @@ import com.akigrafsoft.knetthreads.Message;
 import com.akigrafsoft.knetthreads.RequestEnum;
 import com.akigrafsoft.knetthreads.konnector.Konnector;
 import com.akigrafsoft.knetthreads.konnector.KonnectorDataobject;
+import com.akigrafsoft.knetthreads.routing.EndpointRouter;
 import com.akigrafsoft.knetthreads.routing.KonnectorRouter;
 
 public class ClientServer001Test {
@@ -63,7 +64,7 @@ public class ClientServer001Test {
 			}
 
 			try {
-				Endpoint l_nap = new Endpoint("TESTNAP") {
+				final Endpoint l_ep = new Endpoint("TESTNAP") {
 					@Override
 					public KonnectorRouter getKonnectorRouter(Message message, KonnectorDataobject dataobject) {
 						// TODO Auto-generated method stub
@@ -77,7 +78,7 @@ public class ClientServer001Test {
 						return null;
 					}
 				};
-				l_nap.setDispatcher(new Dispatcher<RequestEnum>("foo") {
+				l_ep.setDispatcher(new Dispatcher<RequestEnum>("foo") {
 
 					@Override
 					public FlowProcessContext getContext(Message message, KonnectorDataobject dataobject,
@@ -87,7 +88,12 @@ public class ClientServer001Test {
 					}
 				});
 
-				server_konnector.setEndpoint(l_nap);
+				server_konnector.setEndpointRouter(new EndpointRouter() {
+					@Override
+					public Endpoint resolveKonnector(Message message, KonnectorDataobject dataobject) {
+						return l_ep;
+					}
+				});
 			} catch (ExceptionDuplicate e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
