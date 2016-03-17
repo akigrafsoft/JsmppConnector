@@ -69,7 +69,8 @@ public class JsmppServerConfiguration extends KonnectorConfiguration {
 	public void audit() throws ExceptionAuditFailed {
 		super.audit();
 		if ((port < MIN_PORT_NUMBER) || (port > MAX_PORT_NUMBER)) {
-			throw new ExceptionAuditFailed("port must be provided and > 0");
+			throw new ExceptionAuditFailed("port must be provided and comprised between " + MIN_PORT_NUMBER + " and "
+					+ MAX_PORT_NUMBER + " (included)");
 		}
 		if ((systemId == null) || systemId.equals("")) {
 			throw new ExceptionAuditFailed("systemId must be provided and non empty");
